@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QtNetwork>
 
-#include "../nodesocket.h"
+#include "nodesocket.h"
 
 class UDPClient : public NodeSocket
 {
@@ -15,14 +15,32 @@ public:
     virtual ~UDPClient();
 
 signals:
+    void dataReplyReceived(QString);
+    void controllerAction(QString);
     void connected(bool status);
 
 public slots:
     void startSocket();
+    void stopSocket();
     void sendUserCommand(QString command);
+
+protected slots:
+    void startClient();
+    void sendAliveMsg();
+    void stopAliveMsg();
 
 private:
     void handleDataReply(const QByteArray datagram);
+    void sendSYN();
+    void sendACK();
+    void startAliveMsg();
+    void handleControllerAction(const QString datagram);
+    void handleDataReply(const QString datagram);
+
+    void processDatagram(const QByteArray &datagram);
+
+    // Alive Message Send Frequency: client constant
+    static const int AMSF = 750;
 };
 
 #endif // UDPCLIENT_H

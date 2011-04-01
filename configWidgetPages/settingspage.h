@@ -30,6 +30,8 @@ private slots:
 
 private:
     void makeConnections();
+    void addCommand(QString command);
+    void toggleCommands(bool isUp);
 
     // Stream Textfield & ClearButton Section
     QGroupBox *settingsGroup;
@@ -47,6 +49,10 @@ private:
 
     // Main Layout
     QVBoxLayout *mainLayout;
+
+    // Command List
+    QStringList *commands;
+    int i_commands;
 };
 
 #endif // SETTINGSPAGE_H

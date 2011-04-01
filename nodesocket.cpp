@@ -60,7 +60,7 @@ NodeSocket::~NodeSocket()
     ownNode->~Node();
     otherNode->~Node();
 
-    qDebug() << "NodeSocket(Client/Server) Object Destroyed";
+    qDebug() << "NodeSocket Object Destroyed";
 }
 
 QString NodeSocket::address() const
@@ -127,8 +127,8 @@ void NodeSocket::processPendingDatagrams()
         QByteArray datagram;
         datagram.resize(udpSocket->pendingDatagramSize());
         udpSocket->readDatagram(datagram.data(), datagram.size());
-        qDebug() << "--Datagram received: " << datagram.data();
 
+        qDebug() << "--Datagram received: " << datagram.data();
         processDatagram(datagram);
         qDebug() << "//Datagram processed: " << datagram.data();
     }
@@ -137,7 +137,7 @@ void NodeSocket::processPendingDatagrams()
 // TODO: make server independant, usable for both client and server
 void NodeSocket::nodeLost()
 {
-    stopAliveTimer();
+    //stopAliveTimer();
     setConnected(false);
 
     qDebug() << "aliveTimer stopped, alive signal not received in time, connection to other node (client) is lost";
@@ -150,65 +150,6 @@ void NodeSocket::noResponse()
     setConnected(false);
 
     qDebug() << "TimeOut stopped, expected response not received";
-}
-
-/*
- *
- * PROTECTED SLOTS (SERVER SPECIFIC)
- *
- */
-void NodeSocket::startServer()
-{
-    // Bind to IP and port
-    int port = 50000;
-    ownNode->setPort(port);
-    udpSocket->bind(QHostAddress(ownNode->address()), ownNode->port());
-    qDebug() << "Trying to bind this address: " << ownNode->address() << ":" << ownNode->port();
-
-    // Bind other Node port to 50001
-    port = 50001;
-    otherNode->setPort(port);
-
-    // Make connection to read incomming messages
-    connect(udpSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
-    // Make connection with aliveTimer to call nodeLost
-    connect(aliveTimer, SIGNAL(timeout()), this, SLOT(nodeLost()));
-    qDebug() << "Socket connected!";
-}
-
-/*
- *
- * PROTECTED SLOTS (CLIENT SPECIFIC)
- *
- */
-void NodeSocket::startClient()
-{
-    // Bind to IP and port
-    int port = 50001;
-    ownNode->setPort(port);
-    udpSocket->bind(QHostAddress(ownNode->address()), ownNode->port());
-    qDebug() << "Trying to bind this address: " << ownNode->address() << ":" << ownNode->port();
-
-    // Bind other Node port to 50000
-    port = 50000;
-    otherNode->setPort(port);
-
-    // Make connection to read incomming messages
-    connect(udpSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
-    qDebug() << "Socket connected!";
-
-    // Send initial message
-    sendSYN();
-}
-
-// Used when class is used as client
-void NodeSocket::sendAliveMsg()
-{
-    QString address = udpSocket->localAddress().toString();
-    quint16 port = udpSocket->localPort();
-    QByteArray datagram = "5;" + address.toLatin1() + ";" +  QByteArray::number(port);
-    //QByteArray datagram = "5:127.0.0.1:55000";
-    sendDatagram(datagram);
 }
 
 
@@ -232,68 +173,68 @@ void NodeSocket::setConnected(const bool connectionBool)
 // Even no's = Client case
 void NodeSocket::processDatagram(const QByteArray &datagram)
 {
-    QString datastring(datagram);
-    switch (datastring.section(';',0,0).toInt())
-    {
-    case 1:
-        // Server case: reply to SYN msg
-        sendSYNACK();
+//    QString datastring(datagram);
+//    switch (datastring.section(';',0,0).toInt())
+//    {
+//    case 1:
+//        // Server case: reply to SYN msg
+//        sendSYNACK();
 
-        qDebug() << "processed Datagram case 1";
-        break;
-    case 2:
-        // Client case: reply to SYNACK msg
-        stopTimeOutTimer();
-        sendACK();
+//        qDebug() << "processed Datagram case 1";
+//        break;
+//    case 2:
+//        // Client case: reply to SYNACK msg
+//        stopTimeOutTimer();
+//        sendACK();
 
-        qDebug() << "processed Datagram case 2";
-        break;
-    case 3:
-        // Server case: reply to ACK msg
-        stopTimeOutTimer();
-        sendAME();
+//        qDebug() << "processed Datagram case 2";
+//        break;
+//    case 3:
+//        // Server case: reply to ACK msg
+//        stopTimeOutTimer();
+//        sendAME();
 
-        qDebug() << "processed Datagram case 3: Handshake complete";
-        break;
-    case 4:
-        //Client case: sent every x msecs to confirm connection
-        setConnected(true);
-        emit connectionEstablished();
+//        qDebug() << "processed Datagram case 3: Handshake complete";
+//        break;
+//    case 4:
+//        //Client case: sent every x msecs to confirm connection
+//        setConnected(true);
+//        emit connectionEstablished();
 
-        stopTimeOutTimer();
-        startAliveMsg();
+//        stopTimeOutTimer();
+//        startAliveMsg();
 
-        qDebug() << "processed Datagram case 4";
-        break;
-    case 5:
-        // Server case: intern reply to the 'alive' msg of the client
-        if (!connected)
-            setConnected(true);
+//        qDebug() << "processed Datagram case 4";
+//        break;
+//    case 5:
+//        // Server case: intern reply to the 'alive' msg of the client
+//        if (!connected)
+//            setConnected(true);
 
-        resetAliveTimer();
+//        resetAliveTimer();
 
-        qDebug() << "processed Datagram case 5";
-        break;
-    case 10:
-        // Client case: receiving reply to the sent request
-        stopTimeOutTimer();
-        handleDataReply(datagram);
+//        qDebug() << "processed Datagram case 5";
+//        break;
+//    case 10:
+//        // Client case: receiving reply to the sent request
+//        stopTimeOutTimer();
+//        handleDataReply(datagram);
 
-        qDebug() << "processed Datagram case 10";
-        break;
-    case 11:
-        // Server case: incomming request for data from server
-        handleDataRequest(datagram);
+//        qDebug() << "processed Datagram case 10";
+//        break;
+//    case 11:
+//        // Server case: incomming request for data from server
+//        handleDataRequest(datagram);
 
-        qDebug() << "processed Datagram case 11";
-        break;
-    case 20:
-        // Client case: receiving controller action
-        handleControllerAction(datagram);
-    default:
-        // Just break on everything else
-        break;
-    }
+//        qDebug() << "processed Datagram case 11";
+//        break;
+//    case 20:
+//        // Client case: receiving controller action
+//        handleControllerAction(datagram);
+//    default:
+//        // Just break on everything else
+//        break;
+//    }
 }
 
 void NodeSocket::sendDatagram(const QByteArray &message)
@@ -341,124 +282,3 @@ QString NodeSocket::findIpAddress() const
     return cAddress.toString();
 }
 
-/*
- *
- * PROTECTED (SERVER SPECIFIC)
- *
- */
-
-// Used when class is used as server
-void NodeSocket::sendSYNACK()
-{
-    QString address = udpSocket->localAddress().toString();
-    quint16 port = udpSocket->localPort();
-    QByteArray datagram = "2;" + address.toLatin1() + ";" +  QByteArray::number(port);
-
-    startTimeOutTimer();
-    sendDatagram(datagram);
-
-    qDebug() << "SYN-ACK Message sent";
-}
-
-// Used when class is used as server
-// AME = Alive Message Expected
-void NodeSocket::sendAME()
-{
-    QString address = udpSocket->localAddress().toString();
-    quint16 port = udpSocket->localPort();
-    QByteArray datagram = "4;" + address.toLatin1() + ";" +  QByteArray::number(port);
-
-    startAliveTimer();
-    sendDatagram(datagram);
-
-    qDebug() << "AME Message sent";
-}
-
-// Used when class is used as server
-void NodeSocket::startAliveTimer()
-{
-    aliveTimer->start(AMTO);
-
-    qDebug() << "aliveTimer started, expecting alive signal at least every " << AMTO << " miliseconds";
-}
-
-// Used when class is used as server
-void NodeSocket::resetAliveTimer()
-{
-    aliveTimer->start(AMTO);
-
-    qDebug() << "Trying to reset aliveTimer";
-}
-
-void NodeSocket::stopAliveTimer()
-{
-    aliveTimer->stop();
-
-    qDebug() << "aliveTimer stopped";
-}
-
-// Used when class is used as server
-void NodeSocket::handleDataRequest(const QString datagram)
-{
-    qDebug() << "NodeSocket::handleDataRequest: " << datagram;
-    QString datastring(datagram);
-    emit dataRequestReceived(datastring.section(";",1));
-    qDebug() << "Data emitted: " << datastring.section(";",1);
-}
-
-/*
- *
- * PROTECTED (CLIENT SPECIFIC)
- *
- */
-
-// Used when class is used as client
-void NodeSocket::sendSYN()
-{
-    // Used when connection is initialised by Client
-    QString address = ownNode->address();
-    quint16 port = ownNode->port();
-    QByteArray datagram = "1;" + address.toLatin1() + ";" +  QByteArray::number(port);
-
-    startTimeOutTimer();
-    sendDatagram(datagram);
-
-    qDebug() << "SYN Message sent to " << otherNode->address() << ":" << otherNode->port();
-}
-
-// Used when class is used as client
-void NodeSocket::sendACK()
-{
-    // Used when connection is initialised by Client
-    QString address = udpSocket->localAddress().toString();
-    quint16 port = udpSocket->localPort();
-    QByteArray datagram = "3;" + address.toLatin1() + ";" +  QByteArray::number(port);
-
-    startTimeOutTimer();
-    sendDatagram(datagram);
-
-    qDebug() << "ACK Message sent";
-}
-
-// Used when class is used as Client
-void NodeSocket::startAliveMsg()
-{
-    connect(aliveTimer, SIGNAL(timeout()), this, SLOT(sendAliveMsg()));
-    aliveTimer->start(AMSF);
-
-    qDebug() << "Alive message started, sending every " << AMSF << " miliseconds";
-}
-
-// Used when class is used as Client
-void NodeSocket::handleDataReply(const QString datagram)
-{
-    qDebug() << "Entered NodeSocket::handleDataReply (parent)";
-
-    QString datastring(datagram);
-    emit dataReplyReceived(datastring.section(";",1));
-}
-
-void NodeSocket::handleControllerAction(const QString datagram)
-{
-    emit controllerAction(datagram.section(';', 1, 1));
-}

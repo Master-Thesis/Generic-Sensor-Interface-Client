@@ -131,6 +131,7 @@ void ConfigWidget::makeConnections()
     // settingsPage Connections
     connect(settingsPage, SIGNAL(connectClicked()), udpClient, SLOT(startSocket()));
     connect(settingsPage, SIGNAL(sendClicked(QString)), udpClient, SLOT(sendUserCommand(QString)));
+    connect(settingsPage, SIGNAL(disconnectClicked()), udpClient, SLOT(stopSocket()));
 
     // consolePage Connections
     connect(consolePage, SIGNAL(startClicked()), this, SLOT(startConsoleStream()));

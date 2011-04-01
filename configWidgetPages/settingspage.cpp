@@ -5,6 +5,11 @@
 SettingsPage::SettingsPage(QWidget *parent)
     : QWidget(parent)
 {
+    // initialise commands QStrinList
+    commands = new QStringList();
+    commands->reserve(10);
+    i_commands = -1;
+
     // Stream Textfield & ClearButton Section
     settingsGroup = new QGroupBox(tr("Settings Display Window"));
 
@@ -57,6 +62,12 @@ void SettingsPage::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Return:
         sendButtonClicked();
         break;
+    case Qt::Key_Up:
+        toggleCommands(true);
+        break;
+    case Qt::Key_Down:
+        toggleCommands(false);
+        break;
     default:
         QWidget::keyPressEvent(event);
     }
@@ -78,6 +89,7 @@ void SettingsPage::sendButtonClicked()
     }
     settingsViewer->append("you-> " + inputField->text());
     emit sendClicked(inputField->text());
+    addCommand(inputField->text());
     inputField->setText("");
     repaint();
 }
@@ -112,3 +124,37 @@ void SettingsPage::adjustToConnection(bool isConnected)
     inputField->setEnabled(isConnected);
     sendButton->setEnabled(isConnected);
 }
+
+void SettingsPage::addCommand(const QString command)
+{
+    i_commands = -1;
+    commands->prepend(command);
+    if(commands->size() > 10)
+        commands->pop_back();
+}
+
+void SettingsPage::toggleCommands(bool isUp)
+{
+    if(isUp)
+    {
+        ++i_commands;
+
+        if(i_commands >= commands->size() || i_commands >= 9)
+            i_commands = commands->size()-1;
+
+        inputField->setText(commands->at(i_commands));
+    }
+    else
+    {
+        if(i_commands == -1)
+            return;
+
+        --i_commands;
+
+        if(i_commands < 0)
+            i_commands = 0;
+
+        inputField->setText(commands->at(i_commands));
+    }
+}
+

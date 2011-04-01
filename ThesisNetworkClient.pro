@@ -16,29 +16,29 @@ TEMPLATE = app
 SOURCES += main.cpp \
     udpclient.cpp \
     configwidget.cpp \
+    node.cpp \
+    nodesocket.cpp \
     configWidgetPages/networkpage.cpp \
     configWidgetPages/settingspage.cpp \
     configWidgetPages/consolepage.cpp \
     configWidgetPages/gamepage.cpp \
-    nodesocket.cpp \
-    node.cpp \
     tetrixWidget/tetrixwindow.cpp \
     tetrixWidget/tetrixpiece.cpp \
-    tetrixWidget/tetrixboard.cpp
+    tetrixWidget/tetrixboard.cpp \
 
 HEADERS += \
     udpclient.h \
     configwidget.h \
+    node.h \
+    nodesocket.h \
     configWidgetPages/networkpage.h \
     configWidgetPages/settingspage.h \
     configWidgetPages/consolepage.h \
     configWidgetPages/ip4validator.h \
     configWidgetPages/gamepage.h \
-    nodesocket.h \
-    node.h \
     tetrixWidget/tetrixwindow.h \
     tetrixWidget/tetrixpiece.h \
-    tetrixWidget/tetrixboard.h
+    tetrixWidget/tetrixboard.h \
 
 RESOURCES += \
     configpages.qrc

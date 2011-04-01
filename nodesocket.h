@@ -29,11 +29,11 @@ signals:
     void connectionEstablished();
     void connectionLost();
     void connectionChanged(bool);
-    // Server Specific
-    void dataRequestReceived(QString);
-    // Client Specific
-    void dataReplyReceived(QString);
-    void controllerAction(QString);
+//    // Server Specific
+//    void dataRequestReceived(QString);
+//    // Client Specific
+//    void dataReplyReceived(QString);
+//    void controllerAction(QString);
 
 public slots:
     // Both
@@ -50,33 +50,33 @@ protected slots:
     void processPendingDatagrams();
     void nodeLost();
     void noResponse();
-    // Server Specific
-    void startServer();
-    // Client Specific
-    void startClient();
-    void sendAliveMsg();
+//    // Server Specific
+//    virtual void startServer();
+//    // Client Specific
+//    virtual void startClient();
+//    virtual void sendAliveMsg();
 
 protected:
     // Both
     void setConnected(const bool connectionBool);
-    void processDatagram(const QByteArray &datagram);
+    virtual void processDatagram(const QByteArray &datagram);
     void sendDatagram(const QByteArray &message);
     void startTimeOutTimer();
     void stopTimeOutTimer();
     QString findIpAddress() const;
-    // Server Specific
-    void sendSYNACK();
-    void sendAME();
-    void startAliveTimer();
-    void resetAliveTimer();
-    void stopAliveTimer();
-    virtual void handleDataRequest(const QString datagram);
-    // Client Specific
-    void sendSYN();
-    void sendACK();
-    void startAliveMsg();
-    void handleControllerAction(const QString datagram);
-    virtual void handleDataReply(const QString datagram);
+//    // Server Specific
+//    virtual void sendSYNACK();
+//    virtual void sendAME();
+//    virtual void startAliveTimer();
+//    virtual void resetAliveTimer();
+//    virtual void stopAliveTimer();
+//    virtual void handleDataRequest(const QString datagram);
+//    // Client Specific
+//    virtual void sendSYN();
+//    virtual void sendACK();
+//    virtual void startAliveMsg();
+//    virtual void handleControllerAction(const QString datagram);
+//    virtual void handleDataReply(const QString datagram);
 
     // Used structures
     QUdpSocket *udpSocket;
