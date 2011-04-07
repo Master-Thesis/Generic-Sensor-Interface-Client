@@ -15,6 +15,7 @@ signals:
     void connectClicked();
     void disconnectClicked();
     void sendClicked(const QString command);
+    void configFileSelected(const QString filepath);
 
 public slots:
     void addToViewer(const QString addText);
@@ -27,6 +28,8 @@ private slots:
     void sendButtonClicked();
     void connectButtonClicked();
     void disconnectButtonClicked();
+    void launchFileDialog();
+    void applyButtonClicked();
 
 private:
     void makeConnections();
@@ -41,6 +44,13 @@ private:
     QPushButton *sendButton;
     QHBoxLayout *inputLayout;
     QVBoxLayout *settingsVertLayout;
+
+    // File Input Section
+    QGroupBox *fileGroup;
+    QLineEdit *filepathField;
+    QPushButton *browseButton;
+    QPushButton *applyButton;
+    QHBoxLayout *fileLayout;
 
     // Buttons Section
     QPushButton *connectButton;

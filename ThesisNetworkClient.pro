@@ -25,6 +25,7 @@ SOURCES += main.cpp \
     tetrixWidget/tetrixwindow.cpp \
     tetrixWidget/tetrixpiece.cpp \
     tetrixWidget/tetrixboard.cpp \
+    configfilehandler.cpp
 
 HEADERS += \
     udpclient.h \
@@ -39,6 +40,7 @@ HEADERS += \
     tetrixWidget/tetrixwindow.h \
     tetrixWidget/tetrixpiece.h \
     tetrixWidget/tetrixboard.h \
+    configfilehandler.h
 
 RESOURCES += \
     configpages.qrc

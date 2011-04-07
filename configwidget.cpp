@@ -2,6 +2,7 @@
 
 #include "configwidget.h"
 #include "udpclient.h"
+#include "configfilehandler.h"
 #include "configWidgetPages/networkpage.h"
 #include "configWidgetPages/settingspage.h"
 #include "configWidgetPages/consolepage.h"
@@ -20,7 +21,7 @@ ConfigWidget::ConfigWidget()
     contentsWidget->setSpacing(12);
 
     pagesWidget = new QStackedWidget;
-    pagesWidget->setMinimumSize(QSize(800,600));
+    pagesWidget->setMinimumSize(QSize(800,700));
 
     networkPage = new NetworkPage;
     networkPage->init(udpClient->otherNodeAddress(), udpClient->otherNodePort());
@@ -132,10 +133,14 @@ void ConfigWidget::makeConnections()
     connect(settingsPage, SIGNAL(connectClicked()), udpClient, SLOT(startSocket()));
     connect(settingsPage, SIGNAL(sendClicked(QString)), udpClient, SLOT(sendUserCommand(QString)));
     connect(settingsPage, SIGNAL(disconnectClicked()), udpClient, SLOT(stopSocket()));
+    connect(settingsPage, SIGNAL(configFileSelected(QString)), ConfigFileHandler::instance(), SLOT(handleFile(QString)));
 
     // consolePage Connections
     connect(consolePage, SIGNAL(startClicked()), this, SLOT(startConsoleStream()));
     connect(consolePage, SIGNAL(stopClicked()), this, SLOT(stopConsoleStream()));
+
+    // ConfigFileHandler Connections
+    connect(ConfigFileHandler::instance(), SIGNAL(commandFromFile(QString)), udpClient, SLOT(sendUserCommand(QString)));
 
     // udpClient Connection
     connect(udpClient, SIGNAL(dataReplyReceived(QString)), settingsPage, SLOT(addToViewer(QString)));

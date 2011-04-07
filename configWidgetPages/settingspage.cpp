@@ -32,6 +32,23 @@ SettingsPage::SettingsPage(QWidget *parent)
 
     settingsGroup->setLayout(settingsVertLayout);
 
+    // initialise file input Section
+    fileGroup = new QGroupBox("Quick Configuration File Selection");
+
+    filepathField = new QLineEdit;
+    filepathField->setEnabled(false);
+    browseButton = new QPushButton(tr("Browse..."));
+    applyButton = new QPushButton(tr("Apply"));
+
+    fileLayout = new QHBoxLayout;
+    fileLayout->addWidget(filepathField);
+    fileLayout->addWidget(browseButton);
+    fileLayout->addSpacing(75);
+    fileLayout->addWidget(applyButton);
+
+    fileGroup->setLayout(fileLayout);
+    fileGroup->setEnabled(false);
+
     // Buttons Section
     connectButton = new QPushButton(tr("Connect"));
     disconnectButton = new QPushButton(tr("Disconnect"));
@@ -47,6 +64,7 @@ SettingsPage::SettingsPage(QWidget *parent)
     // Main Layout
     mainLayout = new QVBoxLayout;
     mainLayout->addWidget(settingsGroup);
+    mainLayout->addWidget(fileGroup);
     mainLayout->addStretch(1);
     mainLayout->addLayout(buttonLayout);
 
@@ -79,6 +97,10 @@ void SettingsPage::makeConnections()
     connect(sendButton, SIGNAL(clicked()), this, SLOT(sendButtonClicked()));
     connect(connectButton, SIGNAL(clicked()), this, SLOT(connectButtonClicked()));
     connect(disconnectButton, SIGNAL(clicked()), this, SLOT(disconnectButtonClicked()));
+    connect(browseButton, SIGNAL(clicked()), this, SLOT(launchFileDialog()));
+    connect(filepathField, SIGNAL(selectionChanged()), this, SLOT(launchFileDialog()));
+    connect(filepathField, SIGNAL(textEdited(QString)), this, SLOT(launchFileDialog()));
+    connect(applyButton, SIGNAL(clicked()), this, SLOT(applyButtonClicked()));
 }
 
 void SettingsPage::sendButtonClicked()
@@ -106,6 +128,28 @@ void SettingsPage::disconnectButtonClicked()
     emit disconnectClicked();
 }
 
+void SettingsPage::launchFileDialog()
+{
+    QString fileName = QFileDialog::getOpenFileName(this,
+        tr("Open Quick Configuration File"), "C:/", tr("Quick Configuration Files (*.qcf)"));
+    filepathField->setText(fileName);
+    qDebug() << "File Name: " << fileName;
+}
+
+void SettingsPage::applyButtonClicked()
+{
+    QFile file(filepathField->text());
+    if (!file.exists() || !file.open(QIODevice::ReadOnly))
+    {
+        QMessageBox msgBox(QMessageBox::Warning, "Warning: invalid file", "The file you selected was not a valid .qcf file!");
+        msgBox.exec();
+        QApplication::processEvents();
+        return;
+    }
+    emit configFileSelected(filepathField->text());
+    filepathField->setText("");
+}
+
 void SettingsPage::addToViewer(QString addText)
 {
     if (addText.isEmpty())
@@ -123,6 +167,7 @@ void SettingsPage::adjustToConnection(bool isConnected)
 
     inputField->setEnabled(isConnected);
     sendButton->setEnabled(isConnected);
+    fileGroup->setEnabled(isConnected);
 }
 
 void SettingsPage::addCommand(const QString command)

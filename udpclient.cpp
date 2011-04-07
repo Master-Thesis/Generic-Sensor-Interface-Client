@@ -14,12 +14,29 @@ UDPClient::~UDPClient()
 
 void UDPClient::startSocket()
 {
-    // Bind to ip and port
+    udpSocket = new QUdpSocket(this);
+
+    // Bind to IP and port
+    int port = 50001;
+    ownNode->setPort(port);
+    udpSocket->bind(QHostAddress(ownNode->address()), ownNode->port());
+    qDebug() << "Trying to bind this address: " << ownNode->address() << ":" << ownNode->port();
+
+    // Bind other Node port to 50000
+    port = 50000;
+    otherNode->setPort(port);
+
+    // Make connection to read incomming messages
+    connect(udpSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
+    qDebug() << "Socket connected!";
+
+    // Send initial message
+    sendSYN();
 
     qDebug() << "UDPClient binded, trying to start";
 
-    startClient();
-    emit connected(true);
+    //startClient();
+    setConnected(true);
 }
 
 void UDPClient::stopSocket()
@@ -27,8 +44,9 @@ void UDPClient::stopSocket()
     qDebug() << "UDPClient disconnected";
     udpSocket->close();
     disconnect(udpSocket, SIGNAL(readyRead()), this, SLOT(processPendingDatagrams()));
+    //udpSocket->deleteLater();
     stopAliveMsg();
-    emit connected(false);
+    setConnected(false);
 }
 
 void UDPClient::sendUserCommand(QString command)
