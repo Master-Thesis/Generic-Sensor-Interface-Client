@@ -267,16 +267,15 @@ QString NodeSocket::findIpAddress() const
     QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
     QHostAddress cAddress;
     for (int i = 0; i < ipAddressesList.size(); ++i) {
-        if (ipAddressesList.at(i).toIPv4Address() &&
+        if (ipAddressesList.at(i).protocol() == QAbstractSocket::IPv4Protocol &&
             ipAddressesList.at(i) != QHostAddress::LocalHost &&
             !ipAddressesList.at(i).toString().startsWith("169"))
         {
+            qDebug() << "IP Found: " <<  ipAddressesList.at(i).toString();
             cAddress = ipAddressesList.at(i);
             break;
         }
         //end if
-        qDebug() << "IP Found: " <<  cAddress.toString();
-        break;
     }
     //end for
     return cAddress.toString();

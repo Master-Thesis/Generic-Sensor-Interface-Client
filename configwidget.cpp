@@ -10,7 +10,8 @@
 
 ConfigWidget::ConfigWidget()
 {
-    udpClient = new UDPClient(true);
+    //udpClient = new UDPClient(true);
+    udpClient = new UDPClient(false);
     udpClient->setPort(50001);
 
     contentsWidget = new QListWidget;
